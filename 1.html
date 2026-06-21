@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【中社】中国・四国地方の自然環境と気候サポートツール</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    /* 風や天候のアニメーション用カスタムCSS */
+    @keyframes windFlowRight {
+      0% { transform: translateX(-50px); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.8; }
+      100% { transform: translateX(250px); opacity: 0; }
+    }
+    @keyframes windFlowLeft {
+      0% { transform: translateX(50px); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.8; }
+      100% { transform: translateX(-250px); opacity: 0; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes precipitate {
+      0% { transform: translateY(-10px); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(30px); opacity: 0; }
+    }
+    .animate-wind-r {
+      animation: windFlowRight 3s linear infinite;
+    }
+    .animate-wind-l {
+      animation: windFlowLeft 3s linear infinite;
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    .animate-rain {
+      animation: precipitate 1.5s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- ヘッダー -->
+  <header class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md py-4 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+      <div>
+        <span class="bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-2">中学地理・自然環境</span>
+        <h1 class="text-xl md:text-2xl font-black inline-block align-middle">中国・四国地方の気候ビジュアルガイド</h1>
+      </div>
+      <p class="text-emerald-100 text-sm font-medium">ワークシートを解くヒントがここにあるよ！</p>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="max-w-6xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow w-full">
+    
+    <!-- 左側：視覚的断面シミュレーター (Lgサイズで7カラム) -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="text-xl">🏔️</span> 断面図で見る「季節風と山地」のしくみ
+          </h2>
+          <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-md">インタラクティブ</span>
+        </div>
+
+        <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+          ボタンを押すと季節風が吹き、雲や雨・雪が発生します。高い山地が湿った風をさえぎる様子を観察しよう！
+        </p>
+
+        <!-- シミュレーター操作ボタン -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <button id="btn-winter" onclick="activateSeason('winter')" class="py-2.5 px-3 rounded-xl font-bold text-sm transition-all duration-200 border flex flex-col items-center justify-center gap-1 bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100 active:scale-95 shadow-sm">
+            <span class="text-lg">❄️ 冬の季節風</span>
+            <span class="text-[10px] opacity-80">（北西の風・山陰に雪）</span>
+          </button>
+          <button id="btn-summer" onclick="activateSeason('summer')" class="py-2.5 px-3 rounded-xl font-bold text-sm transition-all duration-200 border flex flex-col items-center justify-center gap-1 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 active:scale-95 shadow-sm">
+            <span class="text-lg">☀️ 夏の季節風</span>
+            <span class="text-[10px] opacity-80">（南東の風・南四国に雨）</span>
+          </button>
+          <button id="btn-reset" onclick="activateSeason('clear')" class="py-2.5 px-3 rounded-xl font-bold text-sm transition-all duration-200 border flex flex-col items-center justify-center gap-1 bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200 active:scale-95">
+            <span class="text-lg">🍃 リセット</span>
+            <span class="text-[10px] opacity-80">（ふだんの気候）</span>
+          </button>
+        </div>
+
+        <!-- SVG 断面図アニメーション -->
+        <div class="relative bg-gradient-to-b from-sky-100 to-sky-50 rounded-xl overflow-hidden border border-slate-200 shadow-inner" style="min-height: 280px;">
+          <svg viewBox="0 0 800 350" class="w-full h-full" id="simulator-svg">
+            <!-- 海の表現 -->
+            <!-- 日本海 -->
+            <rect x="0" y="300" width="100" height="50" fill="#38bdf8" />
+            <!-- 瀬戸内海 -->
+            <rect x="370" y="300" width="120" height="50" fill="#38bdf8" />
+            <!-- 太平洋 -->
+            <rect x="700" y="300" width="100" height="50" fill="#38bdf8" />
+
+            <!-- 陸地・山地の形状 (断面図) -->
+            <path d="M 0 300 
+                     L 100 300 
+                     L 160 260 
+                     L 280 140 
+                     L 370 300 
+                     L 490 300 
+                     L 580 80 
+                     L 660 280 
+                     L 700 300 
+                     L 800 300 
+                     L 800 350 
+                     L 0 350 Z" 
+                  fill="#e2e8f0" stroke="#cbd5e1" stroke-width="3" />
+            
+            <!-- 山地の樹木や緑の表現 -->
+            <!-- 中国山地 -->
+            <path d="M 200 220 C 220 180, 260 140, 280 140 C 300 140, 320 180, 350 260" fill="#86efac" opacity="0.6"/>
+            <!-- 四国山地 -->
+            <path d="M 520 200 C 550 110, 570 80, 580 80 C 590 80, 610 110, 640 230" fill="#22c55e" opacity="0.6"/>
+
+            <!-- ラベルテキスト -->
+            <text x="50" y="325" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">日本海</text>
+            <text x="430" y="325" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">瀬戸内海</text>
+            <text x="750" y="325" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">太平洋</text>
+
+            <text x="135" y="285" fill="#475569" font-size="14" font-weight="black" text-anchor="middle">山陰</text>
+            <text x="280" y="120" fill="#1e293b" font-size="14" font-weight="black" text-anchor="middle">中国山地</text>
+            <text x="430" y="285" fill="#475569" font-size="14" font-weight="black" text-anchor="middle">瀬戸内</text>
+            <text x="580" y="60" fill="#1e293b" font-size="14" font-weight="black" text-anchor="middle">四国山地</text>
+            <text x="675" y="270" fill="#475569" font-size="14" font-weight="black" text-anchor="middle">南四国</text>
+
+            <!-- 【アニメーション要素】 -->
+            
+            <!-- 雲グループ（動的表示） -->
+            <!-- 山陰上空の雪雲 -->
+            <g id="cloud-sanin" class="hidden animate-float">
+              <path d="M120 110 a20 20 0 0 1 30 -5 a25 25 0 0 1 45 5 a20 20 0 0 1 10 35 a15 15 0 0 1 -15 10 h-70 a15 15 0 0 1 -5 -40 z" fill="#cbd5e1" />
+              <!-- 雪粒 -->
+              <circle cx="130" cy="170" r="3" fill="white" class="animate-rain" style="animation-delay: 0s;"/>
+              <circle cx="150" cy="180" r="3" fill="white" class="animate-rain" style="animation-delay: 0.3s;"/>
+              <circle cx="170" cy="165" r="3" fill="white" class="animate-rain" style="animation-delay: 0.6s;"/>
+              <circle cx="190" cy="175" r="3" fill="white" class="animate-rain" style="animation-delay: 0.9s;"/>
+            </g>
+
+            <!-- 南四国上空の雨雲 -->
+            <g id="cloud-nanshiko" class="hidden animate-float">
+              <path d="M600 130 a20 20 0 0 1 30 -5 a25 25 0 0 1 45 5 a20 20 0 0 1 10 35 a15 15 0 0 1 -15 10 h-70 a15 15 0 0 1 -5 -40 z" fill="#64748b" />
+              <!-- 雨粒 -->
+              <line x1="620" y1="180" x2="615" y2="195" stroke="#38bdf8" stroke-width="2" class="animate-rain" style="animation-delay: 0s;"/>
+              <line x1="640" y1="180" x2="635" y2="195" stroke="#38bdf8" stroke-width="2" class="animate-rain" style="animation-delay: 0.4s;"/>
+              <line x1="660" y1="180" x2="655" y2="195" stroke="#38bdf8" stroke-width="2" class="animate-rain" style="animation-delay: 0.2s;"/>
+              <line x1="680" y1="180" x2="675" y2="195" stroke="#38bdf8" stroke-width="2" class="animate-rain" style="animation-delay: 0.6s;"/>
+            </g>
+
+            <!-- 風の矢印グループ（冬：日本海から） -->
+            <g id="wind-winter-group" class="hidden">
+              <!-- 海上の上昇湿気 -->
+              <path d="M 30 290 Q 40 260 30 230 T 40 180" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,4" class="animate-float" />
+              <path d="M 60 290 Q 70 260 60 230 T 70 180" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,4" class="animate-float" style="animation-delay: 1s;" />
+              <!-- 風流 -->
+              <path d="M -20 100 Q 50 120 120 140" fill="none" stroke="#60a5fa" stroke-width="6" marker-end="url(#arrow-blue)" class="animate-wind-r" style="animation-delay: 0s;"/>
+              <path d="M -20 140 Q 50 160 120 180" fill="none" stroke="#60a5fa" stroke-width="6" marker-end="url(#arrow-blue)" class="animate-wind-r" style="animation-delay: 1s;"/>
+              <!-- 越えた後の乾燥風（瀬戸内へ吹き下ろす） -->
+              <path d="M 300 150 Q 350 200 400 240" fill="none" stroke="#fb923c" stroke-width="4" marker-end="url(#arrow-orange)" class="animate-wind-r" style="animation-delay: 0.5s;"/>
+            </g>
+
+            <!-- 風の矢印グループ（夏：太平洋から） -->
+            <g id="wind-summer-group" class="hidden">
+              <!-- 海上の上昇湿気 -->
+              <path d="M 770 290 Q 760 260 770 230 T 760 180" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="4,4" class="animate-float" />
+              <path d="M 740 290 Q 730 260 740 230 T 730 180" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="4,4" class="animate-float" style="animation-delay: 1s;" />
+              <!-- 風流 -->
+              <path d="M 820 120 Q 730 140 650 160" fill="none" stroke="#f87171" stroke-width="6" marker-end="url(#arrow-red)" class="animate-wind-l" style="animation-delay: 0s;"/>
+              <path d="M 820 160 Q 730 180 650 200" fill="none" stroke="#f87171" stroke-width="6" marker-end="url(#arrow-red)" class="animate-wind-l" style="animation-delay: 1.2s;"/>
+              <!-- 越えた後の乾燥風（瀬戸内へ吹き下ろす） -->
+              <path d="M 560 90 Q 500 160 440 230" fill="none" stroke="#fb923c" stroke-width="4" marker-end="url(#arrow-orange)" class="animate-wind-l" style="animation-delay: 0.6s;"/>
+            </g>
+
+            <!-- マーカー定義（矢印の頭） -->
+            <defs>
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa" />
+              </marker>
+              <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171" />
+              </marker>
+              <marker id="arrow-orange" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#fb923c" />
+              </marker>
+            </defs>
+          </svg>
+
+          <!-- 状態解説テロップ -->
+          <div id="status-box" class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm border border-slate-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm transition-all duration-300">
+            👈 左上のボタンを押すと、季節ごとの気候シミュレーションが始まります。
+          </div>
+        </div>
+      </div>
+
+      <!-- 地形的理由の解説カード -->
+      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-5 shadow-sm">
+        <h3 class="font-bold text-emerald-900 flex items-center gap-1.5 text-sm mb-2">
+          <span>💡</span> 先生からのワンポイント解説
+        </h3>
+        <p class="text-xs text-emerald-800 leading-relaxed">
+          中国・四国地方の気候を理解するカギは、中央を横切る2つの険しい山地（<strong>中国山地</strong>と<strong>四国山地</strong>）です。日本海や太平洋からやってくる水分を含んだ「季節風」が、山地にぶつかって手前の地域に雨や雪を降らせます。そのため、風が山地を飛び越えた後の<strong>「瀬戸内」には、湿った風が届かず、1年中雨が非常に少なくなります。</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- 右側：ワークシートサポート (Lgサイズで5カラム) -->
+    <div class="lg:col-span-5 flex flex-col gap-6">
+      
+      <!-- タブ切り替えボタン -->
+      <div class="bg-white p-1 rounded-xl shadow-sm border border-slate-200/80 flex gap-1">
+        <button onclick="switchTab('tab-step2')" id="btn-tab-step2" class="flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all duration-150 bg-emerald-600 text-white shadow-sm">
+          🔍 STEP 2：調べ学習補助
+        </button>
+        <button onclick="switchTab('tab-step3')" id="btn-tab-step3" class="flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all duration-150 text-slate-600 hover:bg-slate-100">
+          ✍️ STEP 3：作文アシスト
+        </button>
+      </div>
+
+      <!-- STEP 2 タブ：調べ学習＆AI質問アシスト -->
+      <div id="tab-step2" class="flex flex-col gap-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+          <h3 class="text-md font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <span>🚀</span> AIへかんたん質問コピー機
+          </h3>
+          <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+            AI（GeminiやChatGPTなど）を使って気候の特徴を調べるための「完璧な質問文」を用意したよ！ボタンを押してコピーし、AIに貼り付けてみよう。
+          </p>
+
+          <!-- 質問一覧 -->
+          <div class="flex flex-col gap-3">
+            <!-- 質問1 -->
+            <div class="border border-slate-100 rounded-xl p-3 bg-slate-50 hover:bg-slate-100/50 transition">
+              <span class="text-[10px] font-bold text-sky-600 uppercase tracking-wider block mb-1">鳥取（山陰）について調べる</span>
+              <p id="q-sanin" class="text-xs font-medium text-slate-700 line-clamp-2">「鳥取市など山陰地方の冬に雪や雨が多い理由を、中国山地と冬の季節風の関係に触れて、中学生向けに優しく教えて！」</p>
+              <button onclick="copyText('q-sanin')" class="mt-2 text-xs bg-sky-600 hover:bg-sky-700 text-white font-bold py-1 px-3 rounded-md transition inline-flex items-center gap-1">
+                <span>📋</span> コピーする
+              </button>
+            </div>
+
+            <!-- 質問2 -->
+            <div class="border border-slate-100 rounded-xl p-3 bg-slate-50 hover:bg-slate-100/50 transition">
+              <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider block mb-1">愛媛（瀬戸内）について調べる</span>
+              <p id="q-setouchi" class="text-xs font-medium text-slate-700 line-clamp-2">「愛媛県や瀬戸内地方で、1年中雨が少なくて晴れが多い理由を、2つの山地に挟まれている地形から解説して！」</p>
+              <button onclick="copyText('q-setouchi')" class="mt-2 text-xs bg-amber-600 hover:bg-amber-700 text-white font-bold py-1 px-3 rounded-md transition inline-flex items-center gap-1">
+                <span>📋</span> コピーする
+              </button>
+            </div>
+
+            <!-- 質問3 -->
+            <div class="border border-slate-100 rounded-xl p-3 bg-slate-50 hover:bg-slate-100/50 transition">
+              <span class="text-[10px] font-bold text-rose-600 uppercase tracking-wider block mb-1">高知（南四国）について調べる</span>
+              <p id="q-nanshiko" class="text-xs font-medium text-slate-700 line-clamp-2">「高知県など南四国地方で、夏にものすごい大雨が降る理由を、夏の季節風と黒潮（暖流）、四国山地の関係から教えて！」</p>
+              <button onclick="copyText('q-nanshiko')" class="mt-2 text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold py-1 px-3 rounded-md transition inline-flex items-center gap-1">
+                <span>📋</span> コピーする
+              </button>
+            </div>
+          </div>
+          <!-- コピー完了通知トースト（簡易） -->
+          <div id="toast" class="hidden fixed bottom-4 right-4 bg-slate-800 text-white text-xs px-4 py-2 rounded-full shadow-lg transition-all z-50">コピーしました！</div>
+        </div>
+
+        <!-- ワークシートSTEP 2の「ヒントと正解」 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+          <h3 class="text-md font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <span>👀</span> ワークシートの答え・ヒント
+          </h3>
+          <p class="text-xs text-slate-500 mb-3">
+            教科書をめくるのが面倒な人向け！アコーディオンをタップすると、答えが隠れているよ。
+          </p>
+
+          <div class="flex flex-col gap-2">
+            <details class="group border border-slate-200 rounded-xl">
+              <summary class="flex justify-between items-center p-3 text-xs font-bold text-slate-700 cursor-pointer hover:bg-slate-50 list-none">
+                <span>🏔️ 山陰の空欄に入る言葉は？</span>
+                <span class="transition group-open:rotate-180">▼</span>
+              </summary>
+              <div class="p-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 leading-relaxed">
+                影響を受けるのは「<strong class="text-sky-600">冬</strong>の季節風」。冬に雪や雨が「<strong class="text-sky-600">多い</strong>」。
+              </div>
+            </details>
+
+            <details class="group border border-slate-200 rounded-xl">
+              <summary class="flex justify-between items-center p-3 text-xs font-bold text-slate-700 cursor-pointer hover:bg-slate-50 list-none">
+                <span>🍊 瀬戸内の空欄に入る言葉は？</span>
+                <span class="transition group-open:rotate-180">▼</span>
+              </summary>
+              <div class="p-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 leading-relaxed">
+                2つの山地に挟まれているため、年間を通じて雨が「<strong class="text-amber-600">少ない</strong>」。
+              </div>
+            </details>
+
+            <details class="group border border-slate-200 rounded-xl">
+              <summary class="flex justify-between items-center p-3 text-xs font-bold text-slate-700 cursor-pointer hover:bg-slate-50 list-none">
+                <span>🌊 南四国の空欄に入る言葉は？</span>
+                <span class="transition group-open:rotate-180">▼</span>
+              </summary>
+              <div class="p-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 leading-relaxed">
+                影響を受けるのは「<strong class="text-rose-600">夏</strong>の季節風」。夏に雨が「<strong class="text-rose-600">多い</strong>」。1年を通して「<strong class="text-rose-600">温暖</strong>」。
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 タブ：なりきり作文サポート -->
+      <div id="tab-step3" class="hidden flex flex-col gap-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+          <h3 class="text-md font-bold text-slate-900 mb-1 flex items-center gap-2">
+            <span>🎭</span> なりきりキャラ作文アシスター
+          </h3>
+          <p class="text-xs text-slate-500 mb-4">
+            3人の日常をのぞき、作文に使えるワードやテンプレートを参考にして「自力のセリフ」を考えてみよう！
+          </p>
+
+          <!-- キャラクター切り替えパネル -->
+          <div class="flex gap-1.5 mb-4">
+            <button onclick="showChar('shigeru')" id="btn-char-shigeru" class="flex-1 py-1.5 px-2 text-xs font-bold rounded-lg bg-sky-50 text-sky-700 border border-sky-200">
+              👕 シゲルくん
+            </button>
+            <button onclick="showChar('mikan')" id="btn-char-mikan" class="flex-1 py-1.5 px-2 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100">
+              🍊 ミカンさん
+            </button>
+            <button onclick="showChar('ryuta')" id="btn-char-ryuta" class="flex-1 py-1.5 px-2 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100">
+              🎣 リュウタくん
+            </button>
+          </div>
+
+          <!-- キャラ1: シゲル (山陰) -->
+          <div id="char-shigeru" class="char-panel space-y-4">
+            <div class="flex items-start gap-3 bg-sky-50/50 p-3 rounded-xl border border-sky-100">
+              <div class="w-10 h-10 rounded-full bg-sky-500 flex items-center justify-center text-lg text-white font-black shrink-0">
+                シ
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-sky-900">シゲルくん（山陰・14歳）</h4>
+                <p class="text-[11px] text-sky-800 leading-relaxed mt-0.5">
+                  「冬になると、とにかく毎日天気が悪いんだ。ずっと曇りか雪が降ってる。お母さんから洗濯物の取り込みを頼まれるんだけどね…」
+                </p>
+              </div>
+            </div>
+
+            <!-- 使えるキーワード -->
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">💡 作文に使える魔法ワード</span>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">部屋干し・除湿機</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">じっとり・乾かない</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">冬の日本海（荒波）</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">雪かき・通学がつらい</span>
+              </div>
+            </div>
+
+            <!-- テンプレート -->
+            <div class="bg-slate-50 border border-slate-150 p-3 rounded-lg">
+              <span class="text-[10px] font-bold text-slate-500 block mb-1">💬 書き出しヒント</span>
+              <p class="text-xs text-slate-700 leading-relaxed font-medium">
+                「僕の住む山陰は、冬になると<span class="text-sky-600">○○の風</span>のせいで、毎日<span class="text-sky-600">○○</span>ばかり降るんだ。だから洗濯物はいつも…」
+              </p>
+            </div>
+          </div>
+
+          <!-- キャラ2: ミカン (瀬戸内) -->
+          <div id="char-mikan" class="char-panel space-y-4 hidden">
+            <div class="flex items-start gap-3 bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+              <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-lg text-white font-black shrink-0">
+                ミ
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-amber-900">ミカンさん（瀬戸内・45歳）</h4>
+                <p class="text-[11px] text-amber-800 leading-relaxed mt-0.5">
+                  「瀬戸内の晴れの多さと適度な潮風が、美味しい甘いみかんを育てるのよ。でも、雨が少なすぎるのも毎日の生活を考えると困る面があってね…」
+                </p>
+              </div>
+            </div>
+
+            <!-- 使えるキーワード -->
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">💡 作文に使える魔法ワード</span>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">日照時間（太陽さんさん）</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">水不足・ため池</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">瀬戸内海の穏やかな海面</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">水不足の時の給水制限</span>
+              </div>
+            </div>
+
+            <!-- テンプレート -->
+            <div class="bg-slate-50 border border-slate-150 p-3 rounded-lg">
+              <span class="text-[10px] font-bold text-slate-500 block mb-1">💬 書き出しヒント</span>
+              <p class="text-xs text-slate-700 leading-relaxed font-medium">
+                「瀬戸内は山地に挟まれていて雨が<span class="text-amber-600">○○</span>から、みかん作りには最高なんだけど、時々起こる<span class="text-amber-600">○○</span>が心配でね…」
+              </p>
+            </div>
+          </div>
+
+          <!-- キャラ3: リュウタ (南四国) -->
+          <div id="char-ryuta" class="char-panel space-y-4 hidden">
+            <div class="flex items-start gap-3 bg-rose-50/50 p-3 rounded-xl border border-rose-100">
+              <div class="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center text-lg text-white font-black shrink-0">
+                リ
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-rose-900">リュウタくん（南四国・15歳）</h4>
+                <p class="text-[11px] text-rose-800 leading-relaxed mt-0.5">
+                  「僕らの高知はいつもポカポカしていて、冬でも過ごしやすいのが自慢！だけど、夏の雨の量と、秋に来る台風のパワフルさはヤバいよ！」
+                </p>
+              </div>
+            </div>
+
+            <!-- 使えるキーワード -->
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">💡 作文に使える魔法ワード</span>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">夏の台風・豪雨</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">黒潮（暖流）のおかげ</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">冬もあったかい</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold py-1 px-2 rounded-md">カツオがよく捕れる</span>
+              </div>
+            </div>
+
+            <!-- テンプレート -->
+            <div class="bg-slate-50 border border-slate-150 p-3 rounded-lg">
+              <span class="text-[10px] font-bold text-slate-500 block mb-1">💬 書き出しヒント</span>
+              <p class="text-xs text-slate-700 leading-relaxed font-medium">
+                「南四国は黒潮のおかげで冬でも<span class="text-rose-600">○○</span>だけど、夏になると太平洋からの湿った風のせいで<span class="text-rose-600">○○</span>がすごくて…」
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- フッター -->
+  <footer class="bg-slate-800 text-slate-400 text-xs py-4 text-center border-t border-slate-700 mt-auto">
+    <p>© 2026 中学校社会科 地理の授業用補助教材</p>
+    <p class="mt-1 text-slate-500">このツールはブラウザだけで動くオフライン対応教材です。</p>
+  </footer>
+
+  <!-- JavaScriptによる制御 -->
+  <script>
+    // 季節のアクティブ制御
+    function activateSeason(season) {
+      const winterGroup = document.getElementById('wind-winter-group');
+      const summerGroup = document.getElementById('wind-summer-group');
+      const cloudSanin = document.getElementById('cloud-sanin');
+      const cloudNanshiko = document.getElementById('cloud-nanshiko');
+      const statusBox = document.getElementById('status-box');
+
+      // ボタンのハイライトリセット
+      document.getElementById('btn-winter').classList.remove('ring-4', 'ring-sky-300');
+      document.getElementById('btn-summer').classList.remove('ring-4', 'ring-rose-300');
+
+      if (season === 'winter') {
+        winterGroup.classList.remove('hidden');
+        summerGroup.classList.add('hidden');
+        cloudSanin.classList.remove('hidden');
+        cloudNanshiko.classList.add('hidden');
+        document.getElementById('btn-winter').classList.add('ring-4', 'ring-sky-300');
+        statusBox.innerHTML = "❄️ <strong>冬の様子：</strong> 北西から湿った風が吹き、中国山地に遮られます。風がぶつかる山陰では<strong>大雪や雨</strong>が降り、越えた後の瀬戸内・南四国側には乾いた風が吹き下ろします。";
+      } else if (season === 'summer') {
+        winterGroup.classList.add('hidden');
+        summerGroup.classList.remove('hidden');
+        cloudSanin.classList.add('hidden');
+        cloudNanshiko.classList.remove('hidden');
+        document.getElementById('btn-summer').classList.add('ring-4', 'ring-rose-300');
+        statusBox.innerHTML = "☀️ <strong>夏の様子：</strong> 南東から太平洋の水分を含んだ温かい風が吹き、険しい四国山地にぶつかります。南四国（高知など）では<strong>大雨（台風を含む）</strong>になります。風が四国山地を越えた瀬戸内側は乾燥します。";
+      } else {
+        // リセット
+        winterGroup.classList.add('hidden');
+        summerGroup.classList.add('hidden');
+        cloudSanin.classList.add('hidden');
+        cloudNanshiko.classList.add('hidden');
+        statusBox.innerHTML = "👈 左上のボタンを押すと、季節ごとの気候シミュレーションが始まります。";
+      }
+    }
+
+    // タブ切り替えロジック
+    function switchTab(tabId) {
+      const step2 = document.getElementById('tab-step2');
+      const step3 = document.getElementById('tab-step3');
+      const btnStep2 = document.getElementById('btn-tab-step2');
+      const btnStep3 = document.getElementById('btn-tab-step3');
+
+      if (tabId === 'tab-step2') {
+        step2.classList.remove('hidden');
+        step3.classList.add('hidden');
+        btnStep2.className = "flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all duration-150 bg-emerald-600 text-white shadow-sm";
+        btnStep3.className = "flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all duration-150 text-slate-600 hover:bg-slate-100";
+      } else {
+        step2.classList.add('hidden');
+        step3.classList.remove('hidden');
+        btnStep2.className = "flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all duration-150 text-slate-600 hover:bg-slate-100";
+        btnStep3.className = "flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all duration-150 bg-emerald-600 text-white shadow-sm";
+      }
+    }
+
+    // キャラクター切り替えロジック
+    function showChar(charId) {
+      const shigeru = document.getElementById('char-shigeru');
+      const mikan = document.getElementById('char-mikan');
+      const ryuta = document.getElementById('char-ryuta');
+
+      const btnShigeru = document.getElementById('btn-char-shigeru');
+      const btnMikan = document.getElementById('btn-char-mikan');
+      const btnRyuta = document.getElementById('btn-char-ryuta');
+
+      // 非表示化
+      shigeru.classList.add('hidden');
+      mikan.classList.add('hidden');
+      ryuta.classList.add('hidden');
+
+      // ボタンのスタイルリセット
+      btnShigeru.className = "flex-1 py-1.5 px-2 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100";
+      btnMikan.className = "flex-1 py-1.5 px-2 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100";
+      btnRyuta.className = "flex-1 py-1.5 px-2 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100";
+
+      if (charId === 'shigeru') {
+        shigeru.classList.remove('hidden');
+        btnShigeru.className = "flex-1 py-1.5 px-2 text-xs font-bold rounded-lg bg-sky-50 text-sky-700 border border-sky-200";
+      } else if (charId === 'mikan') {
+        mikan.classList.remove('hidden');
+        btnMikan.className = "flex-1 py-1.5 px-2 text-xs font-bold rounded-lg bg-amber-50 text-amber-700 border border-amber-200";
+      } else if (charId === 'ryuta') {
+        ryuta.classList.remove('hidden');
+        btnRyuta.className = "flex-1 py-1.5 px-2 text-xs font-bold rounded-lg bg-rose-50 text-rose-700 border border-rose-200";
+      }
+    }
+
+    // クリップボードコピー処理
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      
+      // Iframe環境下での動作可能性を考慮した従来のコピー手法
+      const tempTextarea = document.createElement('textarea');
+      tempTextarea.value = text;
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showToast();
+        }
+      } catch (err) {
+        console.error('コピー失敗', err);
+      }
+      
+      document.body.removeChild(tempTextarea);
+    }
+
+    // トースト表示
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('hidden');
+      toast.classList.add('block');
+      setTimeout(() => {
+        toast.classList.remove('block');
+        toast.classList.add('hidden');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

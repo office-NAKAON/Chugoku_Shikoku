@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【中社地理】瀬戸内工業地域：大逆転ストーリーシミュレーター</title>
+  <!-- Tailwind CSS -->
+  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <link href="[https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap](https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap)" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    /* もくもく煙突の煙アニメーション */
+    @keyframes smokeUp {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { transform: translateY(-30px) scale(1.5); opacity: 0; }
+    }
+    .animate-smoke {
+      animation: smokeUp 2s infinite ease-out;
+    }
+    /* 波のおだやかなゆらぎ */
+    @keyframes gentleWave {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+    .animate-wave {
+      animation: gentleWave 4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- ヘッダー -->
+  <header class="bg-gradient-to-r from-slate-800 to-indigo-950 text-white shadow-md py-4 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+      <div>
+        <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-full mr-2">地理・第4時間目</span>
+        <h1 class="text-xl md:text-2xl font-black inline-block align-middle">瀬戸内工業地域の大逆転ストーリー</h1>
+      </div>
+      <p class="text-indigo-200 text-sm font-semibold">〜塩田全滅のピンチから、巨大コンビナートへ！〜</p>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="max-w-6xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow w-full">
+    
+    <!-- 左側：大逆転ビジュアルシミュレーター (Lgサイズで7カラム) -->
+    <div class="lg:col-span-7 flex flex-col gap-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <h2 class="text-lg font-black text-slate-900 flex items-center gap-2 mb-2">
+          <span>🏗️</span> 瀬戸内沿岸「100年の歴史変化」シミュレーター
+        </h2>
+        <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+          時代のボタンを押して、瀬戸内の平らな土地（塩田跡地）と静かな海が、どのように大逆転を果たしたのかをその目で確かめよう！
+        </p>
+
+        <!-- 歴史ステップボタン -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <button id="btn-salt" onclick="setHistoryState('salt')" class="py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-sky-50 border-sky-200 text-sky-800 hover:bg-sky-100 ring-4 ring-sky-300">
+            <span class="text-lg">🧂 昭和初期：塩田</span>
+            <span class="text-[9px] font-normal opacity-80">雨が少ない気候を活かす</span>
+          </button>
+          <button id="btn-waste" onclick="setHistoryState('waste')" class="py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200">
+            <span class="text-lg">☠️ 1960年代：廃業</span>
+            <span class="text-[9px] font-normal opacity-80">安い外国産塩に負けて全滅</span>
+          </button>
+          <button id="btn-factory" onclick="setHistoryState('factory')" class="py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200">
+            <span class="text-lg">🏭 現代：工業地帯</span>
+            <span class="text-[9px] font-normal opacity-80">塩田跡地が大逆転！</span>
+          </button>
+        </div>
+
+        <!-- 視覚的SVGビジュアル -->
+        <div class="relative bg-gradient-to-b from-sky-100 to-blue-200 h-64 rounded-xl border border-slate-300 overflow-hidden shadow-inner">
+          <svg viewBox="0 0 500 240" class="w-full h-full" id="landscape-svg">
+            <!-- 空と雲 -->
+            <path d="M 400 30 Q 420 20, 440 30 T 470 35" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.5"/>
+            <path d="M 50 40 Q 70 30, 90 40 T 120 45" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.5"/>
+
+            <!-- 遠くの山（四国山地／中国山地） -->
+            <path d="M 0 150 Q 80 110, 150 140 T 320 120 T 500 150 L 500 240 L 0 240 Z" fill="#cbd5e1" opacity="0.6"/>
+
+            <!-- 平らな土地（塩田跡地） -->
+            <rect x="0" y="160" width="280" height="80" fill="#e2e8f0" />
+            <line x1="0" y1="160" x2="280" y2="160" stroke="#94a3b8" stroke-width="2" />
+
+            <!-- 瀬戸内海（静かな海面） -->
+            <rect x="280" y="170" width="220" height="70" fill="#0284c7" />
+            <!-- 静かな波の波紋（SVG） -->
+            <path d="M 300 190 Q 330 188 360 190 T 420 190 T 480 190" fill="none" stroke="#38bdf8" stroke-width="2" class="animate-wave"/>
+            <path d="M 290 215 Q 320 213 350 215 T 410 215 T 470 215" fill="none" stroke="#38bdf8" stroke-width="2" class="animate-wave" style="animation-delay: 1.5s"/>
+
+            <!-- 【状態A】塩田のビジュアル群 -->
+            <g id="state-salt-group">
+              <!-- 塩田の区画 -->
+              <rect x="20" y="170" width="60" height="40" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" />
+              <rect x="100" y="170" width="60" height="40" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" />
+              <rect x="180" y="170" width="60" height="40" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" />
+              <!-- 白い塩の山 -->
+              <path d="M 40 190 L 50 175 L 60 190 Z" fill="#f8fafc" stroke="#cbd5e1"/>
+              <path d="M 120 190 L 130 175 L 140 190 Z" fill="#f8fafc" stroke="#cbd5e1"/>
+              <path d="M 200 190 L 210 175 L 220 190 Z" fill="#f8fafc" stroke="#cbd5e1"/>
+              <!-- のどかな運搬小船 -->
+              <g class="animate-wave">
+                <path d="M 340 185 L 380 185 L 370 195 L 350 195 Z" fill="#b45309"/>
+                <line x1="360" y1="185" x2="360" y2="165" stroke="#78350f" stroke-width="2"/>
+                <path d="M 360 165 L 380 175 L 360 180 Z" fill="#f8fafc"/>
+              </g>
+              <text x="140" y="230" fill="#475569" font-size="11" font-weight="black" text-anchor="middle">おだやかな塩田風景</text>
+            </g>
+
+            <!-- 【状態B】廃業・放置砂地 -->
+            <g id="state-waste-group" class="hidden">
+              <!-- 茶色く寂れた土地 -->
+              <rect x="0" y="160" width="280" height="80" fill="#d97706" opacity="0.3"/>
+              <!-- ひび割れ風ライン -->
+              <path d="M 30 180 L 50 190 L 40 210 M 120 175 L 130 195 M 200 180 L 190 210" stroke="#b45309" stroke-width="1.5" opacity="0.5"/>
+              <!-- 立ち枯れた雑草 -->
+              <text x="80" y="195" font-size="12">🌾</text>
+              <text x="170" y="190" font-size="12">🌾</text>
+              <!-- 荒れ果てた看板 -->
+              <rect x="220" y="180" width="30" height="20" fill="#f1f5f9" stroke="#94a3b8" />
+              <line x1="235" y1="200" x2="235" y2="215" stroke="#94a3b8" stroke-width="2" />
+              <text x="235" y="193" fill="#ef4444" font-size="7" font-weight="bold" text-anchor="middle">廃業</text>
+
+              <text x="140" y="230" fill="#991b1b" font-size="11" font-weight="black" text-anchor="middle">全滅した塩田（ただの使い道のない砂地）</text>
+            </g>
+
+            <!-- 【状態C】巨大工場コンビナート -->
+            <g id="state-factory-group" class="hidden">
+              <!-- 工場建屋 -->
+              <rect x="10" y="120" width="80" height="40" fill="#475569" />
+              <polygon points="10,120 30,105 50,120 70,105 90,120" fill="#334155"/>
+              <!-- 石油コンビナート（丸いタンク） -->
+              <circle cx="140" cy="135" r="25" fill="#94a3b8" stroke="#475569" stroke-width="2" />
+              <rect x="120" y="150" width="40" height="10" fill="#64748b" />
+              <!-- パイプライン -->
+              <path d="M 80 145 L 115 145 M 165 145 L 210 145" fill="none" stroke="#cbd5e1" stroke-width="4"/>
+              
+              <!-- 煙突ともくもく煙 -->
+              <rect x="220" y="90" width="12" height="70" fill="#e2e8f0" stroke="#475569" />
+              <line x1="220" y1="100" x2="232" y2="100" stroke="#ef4444" stroke-width="3" />
+              <line x1="220" y1="115" x2="232" y2="115" stroke="#ef4444" stroke-width="3" />
+              
+              <!-- 煙アニメーション -->
+              <circle cx="226" cy="75" r="8" fill="#e2e8f0" class="animate-smoke" style="animation-delay: 0s;"/>
+              <circle cx="226" cy="65" r="12" fill="#cbd5e1" class="animate-smoke" style="animation-delay: 0.8s;"/>
+
+              <!-- 巨大タンカー船（水深が深いから横付け可能！） -->
+              <g>
+                <path d="M 320 160 L 460 160 L 480 185 L 340 185 Z" fill="#1e293b"/>
+                <rect x="420" y="140" width="30" height="20" fill="#f8fafc" stroke="#475569"/>
+                <!-- 赤い船底ライン -->
+                <path d="M 340 185 L 480 185 L 470 195 L 350 195 Z" fill="#ef4444" />
+                <!-- 積荷の石油タンク -->
+                <rect x="345" y="150" width="30" height="10" fill="#94a3b8" rx="3"/>
+                <rect x="380" y="150" width="30" height="10" fill="#94a3b8" rx="3"/>
+                <text x="410" y="175" fill="#ffffff" font-size="8" font-weight="bold">原料輸入（巨大タンカー）</text>
+              </g>
+
+              <text x="140" y="230" fill="#1e3a8a" font-size="11" font-weight="black" text-anchor="middle">大復活！巨大重化学コンビナート</text>
+            </g>
+          </svg>
+
+          <!-- 状態解説テロップ -->
+          <div id="status-box" class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-sm border border-slate-200 p-2.5 rounded-lg text-[11px] text-slate-700 shadow-sm transition-all duration-300 leading-relaxed">
+            👈 上のボタンを押して、瀬戸内の工業化の歴史変化と「なぜ大逆転できたか」の秘密を学ぼう！
+          </div>
+        </div>
+      </div>
+
+      <!-- 地形と海が最適だった理由（デジタル板書補足） -->
+      <div class="bg-gradient-to-br from-indigo-50 to-blue-100 border border-indigo-150 rounded-2xl p-5 shadow-sm">
+        <h3 class="font-bold text-indigo-950 flex items-center gap-1.5 text-sm mb-2">
+          <span>🧐</span> なぜ「塩田の跡地」が大工場に適していたの？
+        </h3>
+        <ul class="text-xs text-indigo-900 leading-relaxed space-y-1.5 list-disc pl-4">
+          <li><strong>もともと平らで広い：</strong> 塩を作るために地面が最初から平らにならされており、そのまま巨大工場の土台にできた！</li>
+          <li><strong>立ち退き（交渉）が不要で安い：</strong> 塩田が廃業した後の「ただの砂地」だったので、人が住んでおらず、格安で一発で買い取れた！</li>
+          <li><strong>海の性質（最大の利点）：</strong> 原料の原油や鉄鉱石は100%海外から輸入。瀬戸内海は<strong>波が極めて穏やかで、水深が深い</strong>ため、超巨大な輸入船が事故なく工場の目の前に直接「横付け」して荷下ろしができた！</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 右側：STEP 3 「工場誘致ラブレターチェッカー」 (Lgサイズで5カラム) -->
+    <div class="lg:col-span-5 flex flex-col gap-5">
+      
+      <!-- メインワーク指示 -->
+      <div class="bg-gradient-to-br from-indigo-900 to-indigo-950 text-white rounded-2xl p-5 shadow-md">
+        <h3 class="font-black flex items-center gap-1.5 text-sm mb-2 text-indigo-200">
+          <span>🔥</span> ワークシート STEP 3 に挑戦！
+        </h3>
+        <p class="text-xs text-indigo-100 leading-relaxed font-medium">
+          あなたは瀬戸内の自治体の<strong>工場誘致（ゆうち）担当者</strong>です。<br>
+          重化学工業（自動車・鉄鋼・石油化学）の社長を説得する「最高のラブレター」を2文で書きましょう！
+        </p>
+      </div>
+
+      <!-- リアルタイム作文チェッカー -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-black text-slate-900 flex items-center gap-1">
+            <span>🤖</span> 誘致ラブレター判定システム
+          </h3>
+          <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded">社長が審査</span>
+        </div>
+
+        <!-- ターゲット社長選択 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">説得したい社長を選んでね：</label>
+          <select id="president-select" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="toyota">🚘 巨大自動車メーカー「セトウチ自動車」の社長</option>
+            <option value="steel">🏗️ 巨大鉄鋼コンビナート「瀬戸内製鉄」の社長</option>
+            <option value="chem">🧪 石油化学メーカー「水島ケミカル」の社長</option>
+          </select>
+        </div>
+
+        <p class="text-xs text-slate-500">
+          下の枠に「アピールメッセージ」を書き、「社長に送信！」ボタンを押そう。合格ワードが入っているかで社長のリアクションが変わるぞ！
+        </p>
+
+        <!-- 作文入力 -->
+        <div class="space-y-2">
+          <textarea id="letter-textarea" rows="4" placeholder="（例）社長！我が街には、廃業して空いた平らで広い塩田跡地が格安で残っています。目の前の瀬戸内海は非常に波が穏やかで、原料を運ぶ巨大な輸入船を直接横付けできるので、工場建設に最適です！" class="w-full text-xs border border-slate-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"></textarea>
+          
+          <div class="flex justify-between items-center">
+            <span class="text-[9px] text-slate-400">※「土地のメリット」「海のメリット」の両方に触れよう。</span>
+            <button onclick="submitLetter()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm active:scale-95">
+              ✉️ 社長に送信！
+            </button>
+          </div>
+        </div>
+
+        <!-- 判定結果（初期は非表示） -->
+        <div id="check-result" class="hidden border-t border-slate-200 pt-4 space-y-3">
+          <div class="flex items-center gap-3">
+            <div id="president-avatar" class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl shrink-0">
+              👔
+            </div>
+            <div>
+              <span id="president-label" class="text-[10px] font-bold text-slate-400 block">〇〇社長</span>
+              <h4 id="president-status" class="text-xs font-bold text-slate-800">うーん、まだ工場を建てる決心がつかないな…</h4>
+            </div>
+          </div>
+
+          <div id="president-comment" class="text-xs p-3 rounded-xl leading-relaxed">
+            <!-- 社長のリアクションコメント -->
+          </div>
+
+          <!-- クリア条件確認 -->
+          <div class="grid grid-cols-2 gap-2 text-[10px] font-bold">
+            <div id="key-land" class="border p-1.5 rounded text-center bg-slate-100 border-slate-200 text-slate-400">
+              🏜️ 土地の強み (塩田/平ら/広い/跡地)
+            </div>
+            <div id="key-sea" class="border p-1.5 rounded text-center bg-slate-100 border-slate-200 text-slate-400">
+              🌊 海の強み (波/静か/穏やか/船/輸入/水深)
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- フッター -->
+  <footer class="bg-slate-800 text-slate-400 text-xs py-4 text-center border-t border-slate-700 mt-auto">
+    <p>© 2026 中学校社会科 地理の授業用補助教材（瀬戸内の工業）</p>
+  </footer>
+
+  <!-- JavaScriptによるビジュアル制御および判定処理 -->
+  <script>
+    // 歴史変化の制御
+    function setHistoryState(state) {
+      const gSalt = document.getElementById('state-salt-group');
+      const gWaste = document.getElementById('state-waste-group');
+      const gFactory = document.getElementById('state-factory-group');
+      const statusBox = document.getElementById('status-box');
+
+      // ボタンハイライトリセット
+      document.getElementById('btn-salt').className = "py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200";
+      document.getElementById('btn-waste').className = "py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200";
+      document.getElementById('btn-factory').className = "py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200";
+
+      if (state === 'salt') {
+        gSalt.classList.remove('hidden');
+        gWaste.classList.add('hidden');
+        gFactory.classList.add('hidden');
+        document.getElementById('btn-salt').className = "py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-sky-50 border-sky-200 text-sky-800 hover:bg-sky-100 ring-4 ring-sky-300 shadow-sm";
+        statusBox.innerHTML = "🧂 <strong>昭和初期：</strong> 瀬戸内の「雨が少なくて晴れが多い気候」を活かし、海水を干して塩を作る『塩田（えんでん）』が全盛期でした。瀬戸内沿岸のほとんどがこのおだやかな白い塩田風景でした。";
+      } 
+      else if (state === 'waste') {
+        gSalt.classList.add('hidden');
+        gWaste.classList.remove('hidden');
+        gFactory.classList.add('hidden');
+        document.getElementById('btn-waste').className = "py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 ring-4 ring-amber-300 shadow-sm";
+        statusBox.innerHTML = "☠️ <strong>1960年代：</strong> 外国から安くて質の良い塩が大量に輸入されるようになり、瀬戸内の塩田は競争に負けて<strong>すべて廃業・廃止</strong>になります。不毛で広く平らな砂地だけが残され、自治体は大ピンチを迎えます。";
+      } 
+      else if (state === 'factory') {
+        gSalt.classList.add('hidden');
+        gWaste.classList.add('hidden');
+        gFactory.classList.remove('hidden');
+        document.getElementById('btn-factory').className = "py-2.5 px-2 rounded-xl font-bold text-xs transition-all border flex flex-col items-center justify-center gap-1 bg-indigo-50 border-indigo-200 text-indigo-800 hover:bg-indigo-100 ring-4 ring-indigo-300 shadow-sm";
+        statusBox.innerHTML = "🏭 <strong>現代：</strong> 『平らで広い土地が格安で空いている』『波が静かで巨大輸入船が直接岸に横付けできる』という最高の条件に目をつけた重化学工業（鉄鋼・石油化学）が大誘致され、<strong>巨大コンビナート地帯として奇跡の大逆転</strong>を遂げました！";
+      }
+    }
+
+    // ラブレター判定システム
+    function submitLetter() {
+      const text = document.getElementById('letter-textarea').value.trim();
+      const presidentType = document.getElementById('president-select').value;
+      
+      const resultDiv = document.getElementById('check-result');
+      const avatar = document.getElementById('president-avatar');
+      const label = document.getElementById('president-label');
+      const status = document.getElementById('president-status');
+      const comment = document.getElementById('president-comment');
+      
+      const keyLand = document.getElementById('key-land');
+      const keySea = document.getElementById('key-sea');
+
+      if (!text) {
+        alert('社長へ送る熱いメッセージを入力してください！');
+        return;
+      }
+
+      resultDiv.classList.remove('hidden');
+
+      // 判定ロジック（キーワードチェック）
+      const hasLand = /(塩田|平ら|広い|土地|跡地|平坦|格安|空き地)/.test(text);
+      const hasSea = /(波|静か|穏やか|おだやか|船|輸入|水深|港|横付け)/.test(text);
+
+      // クリアチェックインジケーターのスタイル変更
+      if (hasLand) {
+        keyLand.className = "border p-1.5 rounded text-center bg-amber-100 border-amber-300 text-amber-800";
+      } else {
+        keyLand.className = "border p-1.5 rounded text-center bg-slate-100 border-slate-200 text-slate-400";
+      }
+
+      if (hasSea) {
+        keySea.className = "border p-1.5 rounded text-center bg-blue-100 border-blue-300 text-blue-800";
+      } else {
+        keySea.className = "border p-1.5 rounded text-center bg-slate-100 border-slate-200 text-slate-400";
+      }
+
+      // 社長名・アイコンの設定
+      let presidentName = "";
+      let emoji = "👔";
+      if (presidentType === 'toyota') {
+        presidentName = "セトウチ自動車の社長";
+        emoji = "🚘";
+      } else if (presidentType === 'steel') {
+        presidentName = "瀬戸内製鉄の社長";
+        emoji = "🏗️";
+      } else if (presidentType === 'chem') {
+        presidentName = "水島ケミカルの社長";
+        emoji = "🧪";
+      }
+      avatar.innerText = emoji;
+      label.innerText = presidentName;
+
+      // 合否による社長のセリフ分岐
+      if (hasLand && hasSea) {
+        status.innerText = "「即決だ！ここに巨大工場を建設しよう！」";
+        status.className = "text-xs font-bold text-emerald-700";
+        comment.className = "text-xs p-3 rounded-xl leading-relaxed bg-emerald-50 border border-emerald-200 text-emerald-800";
+        comment.innerHTML = `「素晴らしいアピールだ！工場を建てる上で、<strong>平らで広い土地（塩田跡地）</strong>が用意されているのは建設コストが劇的に安くなって大助かりだ。さらに、<strong>波が静かで巨大な輸入船を直接横付けできる海</strong>があるなら、海外からの資源輸入も完ぺきだな。我が社の運命をこの街に預けよう！」`;
+      } 
+      else if (hasLand && !hasSea) {
+        status.innerText = "「土地は素晴らしいが、物流が不安だな…」";
+        status.className = "text-xs font-bold text-amber-700";
+        comment.className = "text-xs p-3 rounded-xl leading-relaxed bg-amber-50 border border-amber-200 text-amber-800";
+        comment.innerHTML = `「塩田跡地の、平らで広いスペースを安く提供してくれるという提案は、企業として非常に魅力的だ。しかし我が社は巨大な輸入船で鉄鉱石や石油を運んでくる。目の前の<strong>瀬戸内海がどれほど波が静かで船を横付けしやすいか（海のメリット）</strong>についても保証してくれないと、工場は建てられないな…」`;
+      } 
+      else if (!hasLand && hasSea) {
+        status.innerText = "「海は最高だが、工場の敷地はどうする？」";
+        status.className = "text-xs font-bold text-sky-700";
+        comment.className = "text-xs p-3 rounded-xl leading-relaxed bg-sky-50 border border-sky-200 text-sky-800";
+        comment.innerHTML = `「確かに瀬戸内海は穏やかで港としては一級品。海外から資源を船で運ぶには完璧な立地だ！しかし、肝心の工場を建てる敷地はどうなっているんだ？山を切り開いたり、多くの住民に立ち退いてもらったりするのは莫大な時間とコストがかかる。使われなくなった<strong>『平らで広い土地（塩田の跡地）』</strong>があることをしっかりアピールしてほしい！」`;
+      } 
+      else {
+        status.innerText = "「これでは他県の誘致に負けてしまうよ…」";
+        status.className = "text-xs font-bold text-red-700";
+        comment.className = "text-xs p-3 rounded-xl leading-relaxed bg-red-50 border border-red-200 text-red-800";
+        comment.innerHTML = `「うーん、我が社を呼び込むための我が街の具体的なメリットが伝わってこないな。重化学工業に最も必要な<strong>『平らで広い土地の確保（塩田跡地）』</strong>と、海外輸入を有利にする<strong>『波が静かで巨大な船を横付けできる港（海の強み）』</strong>について、しっかりアピールし直してみてくれ！」`;
+      }
+    }
+  </script>
+</body>
+</html>
