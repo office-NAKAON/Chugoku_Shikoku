@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>【中社地理】中国・四国地方の農業工夫ビジュアルガイド</title>
-  <!-- Tailwind CSS (正しいURLに修正) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts (正しいURLに修正) -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -259,7 +259,7 @@
         <div class="space-y-3">
           <textarea id="pitch-textarea" rows="4" placeholder="例：高知県は冬でも温暖な気候です。この暖かい気候を活かしたビニールハウスによる促成栽培で、どこよりも早く新鮮で美味しいナスをお届けできます！" class="w-full text-xs md:text-sm border border-slate-300 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed shadow-inner"></textarea>
           
-          <!-- alert()の代わりとなるインラインエラーメッセージエリア -->
+          <!-- インラインエラーメッセージエリア -->
           <div id="error-message" class="hidden text-red-600 text-xs font-bold bg-red-50 p-2.5 rounded-lg border border-red-200 transition-all"></div>
 
           <div class="flex justify-between items-center gap-2">
@@ -370,7 +370,7 @@
       const keyClimate = document.getElementById('key-climate');
       const keyMethod = document.getElementById('key-method');
 
-      // 入力検証（alertの代わりにUI上のエラーメッセージを使用）
+      // 入力検証
       if (!text) {
         errorDiv.innerText = "⚠️ 売り込みメッセージを入力してからボタンを押してね！";
         errorDiv.classList.remove('hidden');
@@ -382,7 +382,7 @@
       errorDiv.classList.add('hidden');
       resultDiv.classList.remove('hidden');
 
-      // キーワード判定（簡易的な正規表現）
+      // キーワード判定
       const hasClimate = /(暖|温|気候|太陽|日差し)/.test(text);
       const hasMethod = /(ビニール|ハウス|促成|そくせい|工夫)/.test(text);
 
@@ -412,7 +412,7 @@
         buyerStatus.innerText = "気候の良さは分かったけど…";
         buyerStatus.className = "text-sm font-bold text-amber-700";
         buyerComment.className = "text-xs md:text-sm p-4 rounded-xl leading-relaxed bg-amber-50 border border-amber-200 text-amber-800";
-        buyerComment.innerHTML = "「暖かい気候についてはよく伝わりました。でも、なぜ冬にナスが届くのか、ビニールハウスなどの<strong>『農業の工夫（促成栽培など）』</strong>についても説明してほしいな。そこが分かればお客さんをもっと納得させられるんだけど！」";
+        buyerComment.innerHTML = "「暖かい気候についてはよく伝わりました。でも、なぜ winter (冬) にナスが届くのか、ビニールハウスなどの<strong>『農業の工夫（促成栽培など）』</strong>についても説明してほしいな。そこが分かればお客さんをもっと納得させられるんだけど！」";
       } 
       else if (!hasClimate && hasMethod) {
         buyerAvatar.innerText = "🤨";
@@ -426,7 +426,7 @@
         buyerStatus.innerText = "これではアピール不足です…";
         buyerStatus.className = "text-sm font-bold text-red-700";
         buyerComment.className = "text-xs md:text-sm p-4 rounded-xl leading-relaxed bg-red-50 border border-red-200 text-red-800";
-        buyerComment.innerHTML = "「ちょっと文章が短くてナスの良さが伝わってきません。高知の<strong>『気候の良さ』</strong>と、冬に出荷するための<strong>『栽培の工夫』</strong>をアピールして、もう一度書き線し直してみてください。待っています！」";
+        buyerComment.innerHTML = "「ちょっと文章が短くてナスの良さが伝わってきません。高知の<strong>『気候の良さ』</strong>と、冬に出荷するための<strong>『栽培の工夫』</strong>をアピールして、もう一度書き直しをしてみてください。待っています！」";
       }
     }
   </script>
